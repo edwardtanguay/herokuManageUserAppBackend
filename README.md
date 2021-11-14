@@ -24,5 +24,5 @@ See also the [frontend](https://github.com/edwardtanguay/herokuManageUserAppFron
 ## Publish site to Heroku
 
 - create and push your code to a repository called e.g. `herokuManageUserAppBackend`
-- create a Heroku site also called `herokuManageUserAppBackend` connected to that repository
+- create a Heroku site connected to that repository
 - create an environment variable called `MONGODB_URI` which contains as its value the connection string to your Atlas/MongoDB database, e.g. `mongodb+srv://mainuser:YOURPASSWORD@cluster0.ogshn.mongodb.net/app001`
