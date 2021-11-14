@@ -16,7 +16,12 @@ See also the [frontend](https://github.com/edwardtanguay/herokuManageUserAppFron
 - open `test.http`
 - click on e.g. "Send Request" under "### show all users"
 
-## Publish to Heroku
+## Upload JSON file to MongoDB Atlas
+
+- download [users100.json](https://raw.githubusercontent.com/edwardtanguay/downloads/master/users100.json)
+- use `mongoimport` to upload it to your MongoDB/Atlas cluster, see [these instructions](https://onespace.netlify.app/howtos?id=435)
+
+## Publish site to Heroku
 
 - create and push your code to a repository called e.g. `herokuManageUserAppBackend`
 - create a Heroku site also called `herokuManageUserAppBackend` connected to that repository
