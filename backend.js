@@ -14,9 +14,9 @@ const sessionIds = [];
 let sessionId = 0;
 
 const debug = (idCode) => {
-	console.log(idCode)
-	console.log('sessionId: ' + sessionId);
-	console.log('sessionIds: ' + sessionIds.join('|'));
+	// console.log(idCode)
+	// console.log('sessionId: ' + sessionId);
+	// console.log('sessionIds: ' + sessionIds.join('|'));
 }
 
 const uriIsAllowed = function (req, res, next) {
@@ -69,7 +69,6 @@ app.post('/login', (req, res) => {
 		sessionIds.push(sessionId);
 		debug('good login');
 		res.cookie('sessionId', sessionId, { maxAge: 9000000000 });
-		console.log('after cookie set');
 		res.json({
 			idCode: 'adminLoggedIn',
 			sessionId
@@ -95,8 +94,6 @@ app.post('/logout', (req, res) => {
 app.get('/', (req, res) => {
 	debug('show all');
 	sessionId = req.cookies.sessionId;
-	console.log('got back: ' + sessionId);
-	console.log(sessionIds);
 	execMongo(async (db) => {
 		const users = await db.collection('users100').find()
 			.project({
