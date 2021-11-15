@@ -7,6 +7,7 @@ const app = express();
 const port = process.env.PORT || 3016;
 dotenv.config();
 const mongoConnectString = process.env.MONGODB_URI;
+const allowedFrontendUri = process.env.ALLOWED_FRONTEND_URI;
 const client = new MongoClient(mongoConnectString);
 
 app.use(cors());
@@ -22,7 +23,8 @@ app.get('/', (req, res) => {
 	const referer = req.headers.referer;
 	console.log('THE_REFERER_IS: ' + referer);
 	console.log('ALLOWED_FRONTEND_URI: ' + process.env.ALLOWED_FRONTEND_URI);
-	if (referer === undefined || !referer.startsWith(process.env.ALLOWED_FRONTEND_URI)) {
+	console.log('allowedFrontendUri: ' + allowedFrontendUri);
+	if (referer === undefined || !referer.startsWith(allowedFrontendUri)) {
 		res.status(403).send('no access');
 	} else {
 		execMongo(async (db) => {
