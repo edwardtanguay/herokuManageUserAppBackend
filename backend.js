@@ -55,7 +55,6 @@ const execMongo = async (done) => {
 
 app.post('/login', (req, res) => {
 	const pin = req.body.pin;
-
 	if (pin === process.env.SITE_PIN) {
 		if (!req.cookies.sessionId) {
 			sessionId = Math.floor(Math.random() * 100000000000);
@@ -63,7 +62,8 @@ app.post('/login', (req, res) => {
 			debug('good login');
 			res.cookie('sessionId', sessionId, { maxAge: 9000000000 });
 			res.json({
-				idCode: 'adminLoggedIn'
+				idCode: 'adminLoggedIn',
+				sessionId
 			});
 		} else {
 			debug('already logged in');
@@ -88,8 +88,10 @@ app.post('/logout', (req, res) => {
 	});
 });
 
-app.get('/', (req, res) => {
+app.post('/', (req, res) => {
 	debug('show all');
+	sessionId = req.body.sessionId;
+	console.log('got back: ' + sessionId);
 	execMongo(async (db) => {
 		const users = await db.collection('users100').find()
 			.project({
@@ -99,7 +101,7 @@ app.get('/', (req, res) => {
 			}).toArray();
 		res.json({
 			users,
-			userIsAdmin: sessionId !== 0
+			userIsAdmin: sessionIds.includes(sessionId)
 		});
 	});
 });
