@@ -18,7 +18,7 @@ const execMongo = async (done) => {
 	done(db);
 }
 
-const uriIsAllowed = (req) => {
+const uriIsAllowed = (req, res) => {
 	const referer = req.headers.referer;
 	if (referer === undefined || !referer.startsWith(process.env.ALLOWED_FRONTEND_URI)) {
 		res.status(403).send('no access');
@@ -26,7 +26,7 @@ const uriIsAllowed = (req) => {
 }
 
 app.get('/', (req, res) => {
-	if (uriIsAllowed(req)) {
+	if (uriIsAllowed(req, res)) {
 		execMongo(async (db) => {
 			const users = await db.collection('users100').find()
 				.project({
