@@ -1,5 +1,13 @@
 @url = http://localhost:3016 
 
+### login 
+GET {{url}}/login
+content-type: application/json
+
+### logout 
+GET {{url}}/logout
+content-type: application/json
+
 ### show all users 
 GET {{url}} 
 content-type: application/json
