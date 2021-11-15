@@ -20,9 +20,10 @@ const execMongo = async (done) => {
 
 const uriIsAllowed = (req, res) => {
 	const referer = req.headers.referer;
-	console.log('REF: ' + referer);
 	if (referer === undefined || !referer.startsWith(process.env.ALLOWED_FRONTEND_URI)) {
 		res.status(403).send('no access');
+	} else {
+		return true;
 	}
 }
 
