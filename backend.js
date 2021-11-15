@@ -20,7 +20,12 @@ const execMongo = async (done) => {
 
 const uriIsAllowed = (req, res) => {
 	const referer = req.headers.referer;
-	if (referer === undefined || !referer.startsWith(process.env.ALLOWED_FRONTEND_URI)) {
+	const host = `http://${req.headers.host}`;
+	let frontendUri = referer;
+	if (frontendUri === undefined) {
+		frontendUri = host;
+	}
+	if (frontendUri === undefined || !frontendUri.startsWith(process.env.ALLOWED_FRONTEND_URI)) {
 		res.status(403).send('no access');
 	} else {
 		return true;
