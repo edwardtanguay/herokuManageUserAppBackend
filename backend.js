@@ -21,6 +21,7 @@ const execMongo = async (done) => {
 app.get('/', (req, res) => {
 	const referer = req.headers.referer;
 	console.log('THE_REFERER_IS: ' + referer);
+	console.log('ALLOWED_FRONTEND_URI: ' + process.env.ALLOWED_FRONTEND_URI);
 	if (referer === undefined || !referer.startsWith(process.env.ALLOWED_FRONTEND_URI)) {
 		res.status(403).send('no access');
 	} else {
