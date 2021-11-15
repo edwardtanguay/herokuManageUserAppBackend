@@ -13,7 +13,8 @@ const client = new MongoClient(mongoConnectString);
 const sessionIds = [];
 let sessionId = 0;
 
-const debug = () => {
+const debug = (idCode) => {
+	console.log(idCode)
 	console.log('sessionId: ' + sessionId);
 	console.log('sessionIds: ' + sessionIds.join('|'));
 }
@@ -37,9 +38,9 @@ const adminIsLoggedIn = (req, res) => {
 	return false;
 }
 
+app.use(cors());
 app.use(cookieParser());
 app.use(uriIsAllowed);
-app.use(cors());
 app.use(express.json());
 
 const execMongo = async (done) => {
@@ -48,33 +49,42 @@ const execMongo = async (done) => {
 	done(db);
 }
 
-app.get('/login', (req, res) => {
-	if (!req.cookies.sessionId) {
-		sessionId = Math.floor(Math.random() * 100000000000);
-		sessionIds.push(sessionId);
-		debug();
-		res.cookie('sessionId', sessionId, { maxAge: 9000000000 });
-		res.json({
-			response: 'ok'
-		});
+app.post('/login', (req, res) => {
+	const pin = req.body.pin;
+	if (true || pin === process.env.SITE_PIN) {
+		if (!req.cookies.sessionId) {
+			sessionId = Math.floor(Math.random() * 100000000000);
+			sessionIds.push(sessionId);
+			debug('good login');
+			res.cookie('sessionId', sessionId, { maxAge: 9000000000 });
+			res.json({
+				message: 'ok'
+			});
+		} else {
+			debug('already logged in');
+			res.json({
+				message: 'you are already logged in'
+			});
+		}
 	} else {
-		debug();
-		res.json({
-			response: 'you are already logged in'
-		});
+		debug('bad login');
+		res.status(401).json({
+			message: "bad login"	
+		})
 	}
 });
 
-app.get('/logout', (req, res) => {
+app.post('/logout', (req, res) => {
 	sessionId = 0;
-	debug();
+	debug('logout');
 	res.clearCookie('sessionId');
 	res.json({
-		response: 'you are now logged out'
+		message: 'logged out'
 	});
 });
 
 app.get('/', (req, res) => {
+	debug('show all');
 	execMongo(async (db) => {
 		const users = await db.collection('users100').find()
 			.project({
@@ -82,7 +92,10 @@ app.get('/', (req, res) => {
 				username: 1,
 				email: 1
 			}).toArray();
-		res.json(users);
+		res.json({
+			users,
+			userIsAdmin: sessionId !== 0
+		});
 	});
 });
 
