@@ -33,6 +33,14 @@ const uriIsAllowed = function (req, res, next) {
 	}
 }
 
+const allowCrossDomain = (req, res, next) => {
+	res.header('Access-Control-Allow-Origin', 'http://localhost:3001');
+	res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
+	res.header('Access-Control-Allow-Headers', 'Content-Type');
+	res.header('Access-Control-Allow-Credentials', 'true');
+	next();
+}
+
 const adminIsLoggedIn = (req, res) => {
 	if (sessionId === 0) {
 		res.status(401).send('admin access required');
@@ -42,8 +50,9 @@ const adminIsLoggedIn = (req, res) => {
 	}
 }
 
-app.use(cors());
 app.use(cookieParser());
+// app.use(cors());
+app.use(allowCrossDomain);
 app.use(uriIsAllowed);
 app.use(express.json());
 
@@ -56,21 +65,15 @@ const execMongo = async (done) => {
 app.post('/login', (req, res) => {
 	const pin = req.body.pin;
 	if (pin === process.env.SITE_PIN) {
-		if (!req.cookies.sessionId) {
-			sessionId = Math.floor(Math.random() * 100000000000);
-			sessionIds.push(sessionId);
-			debug('good login');
-			res.cookie('sessionId', sessionId, { maxAge: 9000000000 });
-			res.json({
-				idCode: 'adminLoggedIn',
-				sessionId
-			});
-		} else {
-			debug('already logged in');
-			res.json({
-				message: 'you are already logged in'
-			});
-		}
+		sessionId = Math.floor(Math.random() * 100000000000);
+		sessionIds.push(sessionId);
+		debug('good login');
+		res.cookie('sessionId', sessionId, { maxAge: 9000000000 });
+		console.log('after cookie set');
+		res.json({
+			idCode: 'adminLoggedIn',
+			sessionId
+		});
 	} else {
 		debug('bad login');
 		res.status(401).json({
@@ -83,15 +86,17 @@ app.post('/logout', (req, res) => {
 	sessionId = 0;
 	debug('logout');
 	res.clearCookie('sessionId');
+	// res.cookie('sessionId', '', { maxAge: 9000000000 });
 	res.json({
 		idCode: 'adminLoggedOut'
 	});
 });
 
-app.post('/', (req, res) => {
+app.get('/', (req, res) => {
 	debug('show all');
-	sessionId = req.body.sessionId;
+	sessionId = req.cookies.sessionId;
 	console.log('got back: ' + sessionId);
+	console.log(sessionIds);
 	execMongo(async (db) => {
 		const users = await db.collection('users100').find()
 			.project({
@@ -101,7 +106,8 @@ app.post('/', (req, res) => {
 			}).toArray();
 		res.json({
 			users,
-			userIsAdmin: sessionIds.includes(sessionId)
+			sessionId,
+			userIsAdmin: sessionIds.includes(Number(sessionId))
 		});
 	});
 });
