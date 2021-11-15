@@ -55,7 +55,8 @@ const execMongo = async (done) => {
 
 app.post('/login', (req, res) => {
 	const pin = req.body.pin;
-	if (true || pin === process.env.SITE_PIN) {
+
+	if (pin === process.env.SITE_PIN) {
 		if (!req.cookies.sessionId) {
 			sessionId = Math.floor(Math.random() * 100000000000);
 			sessionIds.push(sessionId);
