@@ -42,38 +42,44 @@ app.get('/', (req, res) => {
 });
 
 app.delete('/deleteuser/:id', (req, res) => {
-	const id = req.params.id;
-	execMongo(async (db) => {
-		const deleteResult = await db.collection('users100').deleteOne({ _id: new mongodb.ObjectId(id) });
-		res.json({
-			result: deleteResult
+	if (uriIsAllowed(req, res)) {
+		const id = req.params.id;
+		execMongo(async (db) => {
+			const deleteResult = await db.collection('users100').deleteOne({ _id: new mongodb.ObjectId(id) });
+			res.json({
+				result: deleteResult
+			});
 		});
-	});
+	}
 });
 
 app.post('/insertuser', (req, res) => {
-	const user = req.body.user;
-	execMongo(async (db) => {
-		const insertResult = await db.collection('users100').insertOne(user);
-		res.json({
-			result: insertResult
+	if (uriIsAllowed(req, res)) {
+		const user = req.body.user;
+		execMongo(async (db) => {
+			const insertResult = await db.collection('users100').insertOne(user);
+			res.json({
+				result: insertResult
+			});
 		});
-	});
+	}
 });
 
 app.patch('/edituseremail/:id', (req, res) => {
-	const id = req.params.id;
-	const email = req.body.email;
-	res.json({
-		id,
-		email
-	});
-	execMongo(async (db) => {
-		const updateResult = await db.collection('users100').updateOne({ _id: new mongodb.ObjectId(id) }, { $set: { email } });
+	if (uriIsAllowed(req, res)) {
+		const id = req.params.id;
+		const email = req.body.email;
 		res.json({
-			result: updateResult
+			id,
+			email
 		});
-	});
+		execMongo(async (db) => {
+			const updateResult = await db.collection('users100').updateOne({ _id: new mongodb.ObjectId(id) }, { $set: { email } });
+			res.json({
+				result: updateResult
+			});
+		});
+	}
 });
 
 app.listen(port, () => {
