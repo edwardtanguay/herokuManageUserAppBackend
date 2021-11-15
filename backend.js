@@ -34,8 +34,12 @@ const uriIsAllowed = function (req, res, next) {
 }
 
 const adminIsLoggedIn = (req, res) => {
-	res.status(401).send('admin access required');
-	return false;
+	if (sessionId === 0) {
+		res.status(401).send('admin access required');
+		return false;
+	} else {
+		return true;
+	}
 }
 
 app.use(cors());
@@ -58,7 +62,7 @@ app.post('/login', (req, res) => {
 			debug('good login');
 			res.cookie('sessionId', sessionId, { maxAge: 9000000000 });
 			res.json({
-				message: 'ok'
+				idCode: 'adminLoggedIn'
 			});
 		} else {
 			debug('already logged in');
@@ -69,7 +73,7 @@ app.post('/login', (req, res) => {
 	} else {
 		debug('bad login');
 		res.status(401).json({
-			message: "bad login"	
+			message: "bad login"
 		})
 	}
 });
@@ -79,7 +83,7 @@ app.post('/logout', (req, res) => {
 	debug('logout');
 	res.clearCookie('sessionId');
 	res.json({
-		message: 'logged out'
+		idCode: 'adminLoggedOut'
 	});
 });
 
